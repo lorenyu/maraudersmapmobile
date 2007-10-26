@@ -1,0 +1,16 @@
+GPS accuracy = 10 m
+
+Yes Flash Lite can access GPS or alternative - just feed it the data.
+http://www.richardleggett.co.uk/blog/index.php/2007/10/22/does_flash_lite_have_a_future
+
+S60 Python NMEA Info Viewer
+A graphical python program that talks to your bluetooth GPS
+http://wiki.opensource.nokia.com/projects/PyS60_applications
+
+A demonstration Python application for Nokia phones that links a 
+Bluetooth GPS to retrieve and display Google Maps in realtime.
+http://www.postneo.com/postwiki/moin.cgi/PythonForSeries60
+
+dealing with fscommand launch
+When it comes 2 way communication between Flash Lite and other applications the more effective way to do this is by running a local server on the device and then using loadVariables or even XMLsocket to talk to the native app. Although theres no point having a local server listen out for FL calls if FL isn't even running. So fscommand is again crucial here as a the starting point of communication.
+http://www.device54.com/

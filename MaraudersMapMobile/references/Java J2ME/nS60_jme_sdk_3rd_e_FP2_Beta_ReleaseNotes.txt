@@ -1,0 +1,269 @@
+========================================================================
+RELEASE NOTE FOR S60 3RD EDITION SDK FOR SYMBIAN OS,     24.08.2007
+SUPPORTING FEATURE PACK 2, FOR MIDP, BETA
+========================================================================
+
+Product Description
+===================
+
+The S60 3rd Edition SDK for Symbian OS, Supporting Feature Pack 2, for
+MIDP, BETA ("the SDK") enables application development for devices based
+on the S60 Platform using Java. The SDK is based on the S60 3rd Edition,
+supporting Feature Pack 2 and Symbian OS 9.3. The SDK includes all key
+functionality needed for application development (documentation, JavaDoc
+API reference, add-on tools, emulator) excluding IDE and compiler. 
+
+The SDK contains the following APIs:
+Configuration:
+- JSR 139: Connected Limited Device Configuration 1.1
+Profile:
+- JSR 118: Mobile Information Device Profile 2.1
+Optional APIs:
+- JSR 75: PDA Optional Packages for the J2ME™ Platform 1.0, 
+  FileConnection and PIM APIs optional package
+- JSR 82: Java™ APIs for Bluetooth 1.1
+- JSR 120: Wireless Messaging API 1.1
+- JSR 172: J2METM Web Services Specification 1.0
+- JSR 177: Security and Trust Services API for J2ME™ 1.0, SATSA-CRYPTO
+- JSR 177: Security and Trust Services API for J2ME™ 1.0, SATSA-PKI
+- JSR 179: Location API for J2ME™ 1.1
+- JSR 180: SIP API for J2ME™ 1.0
+- JSR 184: Mobile 3D Graphics API for J2ME™ 1.1
+- JSR 205: Wireless Messaging API 2.0
+- JSR 226: Scalable 2D Vector Graphics API for J2ME™ 1.1
+- JSR 135: Mobile Media API 1.1
+- JSR 234: Advanced Multimedia Supplements 1.0
+- JSR 248: Mobile Service Architecture subset
+- Nokia UI API 1.1 
+
+S60 Platform is a complete smartphone reference design. It represents a
+rich environment for developers to create exciting content and
+innovative applications. The platform builds on top of Symbian OS,
+complementing it with a configurable graphical user interface library
+and a comprehensive suite of reference applications. A set of robust
+components and many varied APIs are provided for developers.
+
+
+Features
+========
+- S60 Emulator 
+- Building tools and environment for emulator
+- Documentation
+	- User's guide
+	- Installation guide
+	- Java API Javadoc reference documentation
+- Support for TCP/IP connections in the emulator
+- Emulator supports UI resolutions: QVGA Portrait and QVGA Landscape
+- Emulator supports multiple emulator instances
+- Emulator supports localization plugins for English, Chinese Simplified, 
+  Japanese
+- On-device diagnostics support
+- Support for following IDEs and development products is tested with:
+	- NetBeans IDE 5.5 with Mobility Pack 5.5
+	- Eclipse 3.2.2 with EclipseME 1.7.3. EclipseME 1.7.5 or later
+	  is recommended, see below.
+- The following IDEs and tools are also supported
+	- Nokia Mobile Internet Toolkit 4.1
+
+
+New Features
+============
+- See "What's new in this release" in SDK User's Guide.
+
+
+Updated APIs
+============
+JSR 82: Java™ APIs for Bluetooth 1.1
+JSR 118: Mobile Information Device Profile 2.1
+JSR 226: Scalable 2D Vector Graphics API for J2ME™ 1.1
+JSR 234: Advanced Multimedia Supplements 1.0
+
+For more info see SDK Help Java API Documentation.
+
+System Requirements
+===================
+Basic Requirements:
+- Microsoft Windows XP SP2
+- Minimum 1 GHz Pentium PC, 512 MB of available memory
+- 1 GB free disk space
+- J2SE 5.0 SDK (JDK)
+- Other requirements as required by the IDE used
+
+Additional Requirements:
+- Installation/uninstallation of the SDK requires local admin rights.
+- The supported Bluetooth protocols are BCSP and H4. Bluetooth has been
+  tested with the following devices:
+	- Brainboxes BL-500
+	- Casira Bluetooth Development Kit
+- IrDA has been tested with Extended Systems, Inc. Jeteye pods ESI
+  9680.
+- A MS Windows compatible sound card is required for the audio support.
+- Security and Trust Services API was tested with GemPC USB-SL Smart 
+  Card Reader from GemPlus.
+
+This product requires free registration after test period.
+
+
+Compatibility Issues
+====================
+
+Differences between emulator and S60 devices
+-------------------------------------------- 
+- Camera features are not supported.
+- With some Bluetooth adapters there are problems in using certain 
+  physical COM-ports for Bluetooth adapter with the emulator.
+  
+  Workaround: Try different COM-port for the adapter.
+
+Known Issues
+============
+
+Installation/Uninstallation
+---------------------------
+- It is recommended that JDK and IDE are installed before
+  installing the SDK.
+- The SDK installation path should contain only alphanumeric
+  characters. Currently, the installer allows selecting a path which 
+  contains spaces, but the functionality of a SDK installed to such path 
+  may fail.
+- Installation/uninstallation of the SDK requires local admin rights.
+
+Emulator
+--------
+- The emulator includes most of the S60 applications for convenience.
+  The lack of the actual terminal hardware limits availability of
+  some features like SIM features.
+- The emulated MMC card should be initialized with Memory Application 
+  before first use.
+- In MMC Emulation, removable drive letter is not always updated in
+  configuration panel.
+- When opening DRM content in the SDK, rights object (DRC) must be
+  loaded first using File-Open, before the content (DCF), unlike in S60
+  devices.
+- DRC (Digital Rights) content cannot be 'pushed' to the SDK from NMIT
+  (Nokia Mobile Internet Toolkit). Instead save DRC content in NMIT by
+  using the Save Binary option, and then File-Open them using the SDK.
+
+Emulator Applications
+---------------------  
+- Camera is not supported by S60 Emulator.
+- Smart message sending of the following items do not work in the 
+  emulator.
+  - Phonebook (contacts)
+  - Calendar (calendar items)
+
+Web Run-Time and Widget support
+-------------------------------
+- The included version of Web Run-Time is not final. It is useful for
+  familiarizing yourself with Web Run-Time and widget writing, but 
+  widget tested using this emulator might not run unmodified in the 
+  devices. Please check the Forum Nokia Web site regularly for news 
+  on an SDK with a newer version of Web Run-Time.
+
+Emulator -> Tools
+-----------------
+- Diagnostics -> Drives - RAM Consumption is not happening when open 
+  any Memory Eater Applications on Device 
+- Diagnostics -> MIDlet System.out Redirection: System output has 100 
+  character buffer, and can not be seen before the buffer is full.
+- Events -> Enhancement Events -> Handsfree mode on/off event does not 
+  work. 
+- The emulator fails to start if very large values are configured in 
+  the Preferences 'Memory Capacity' setting (192M or more depending on 
+  environment). oo high value can be reset by editing the epoc.ini file
+  in bin\epoc32\data\epoc.ini and changing the MegabytesOfFreeMemory 
+  setting to a lower value. Eg. the default 32.
+- Preferences -> MIDP Security - "Ask once" is not working correctly for
+  User Defined:Messaging.
+- Utilities -> Removable Drive is not always detected
+
+UEI, IDEs and development
+-------------------------
+The SDK supports integration with following IDEs:
+- NetBeans 5.5 with NetBeans Mobility Pack 5.5
+  - debugging does not work if Examples are imported from previous SDKs.
+    The project definition format has changed from NetBeans 5.0 and the
+    current SDK does not contain new project files for NetBeans 5.5.
+    SOLUTION: Create as a new project, import sources from existing
+    project.
+- Eclipse 3.2.2 with EclipseME 1.7.5 or later is recommended
+  - Emulator supports debugger in server mode. To keep the debug server
+    start-up delay setting (in EclipseME) as short as possible, it is
+    recommended to first run the MIDlet under development, exit the
+    MIDlet and leave the emulator running. This functionality may change
+    in future versions of EclipseME.
+- During development, the DebugAgent can occasionally fail to clean a
+  previously installed instance of a MIDlet if the emulator window is
+  closed when the MIDlet is running. When the MIDlet is run again, the
+  condition is identified by "Symbian error code: -5" -error dialog.
+  SOLUTION: Click "Abort" in "SDK Progress" -window, close emulator and
+  re-run the MIDlet.
+- UEI interface reports ("emulator.exe -version") lists wrong APIs.
+  Correct list can be configured in both Eclipse and NetBeans by user.
+
+
+JSR 135: Mobile Media API
+-------------------------
+- Problems may occur when developing Java applications which use 
+  multimedia, e.g. problems when creating sound loops or controlling tune
+  timing in mobile Java games or when playing video streaming over rtsp 
+  protocol by mobile Java.
+- Some media formats are not available in the emulator.
+
+  Workarounds:
+  - use S60 device hardware (S60 3rd Edition Feature Pack 1 and 2) for testing
+  - use S60 3rd Edition SDK for Symbian OS, for MIDP
+
+
+JSR 234: Advanced Multimedia Supplements
+----------------------------------------
+- Problems may occur when developing Java applications which use 3D 
+  audio, e.g. 3D sound direction, pitch or reverb may not be heard 
+  correctly.
+ 
+  Workarounds:
+  - use S60 device hardware (S60 3rd Edition Feature Pack 1 and 2) for testing
+
+JSR 226: Scalable 2D Vector Graphics API for J2ME™ 1.1
+------------------------------------------------------
+- M2GSVGElement.setPathTrait() can fail.
+
+JSR 205: Wireless Messaging API 2.0
+-----------------------------------
+- MessageConnection.MULTIPART_MESSAGE attribute is missing.
+
+Documentation
+-------------
+- Some IDEs cannot find the Javadoc API documentation provided with the
+  SDK. Workaround: Java API Javadocs are packaged per JSR under the 
+  directory S60_3rd_MIDP_FP2\doc\ and can be accessed from index.html
+- Java API Javadocs contain broken links to files and anchors that
+  are not part of the documentation package.
+- JSR 118 MIDP 2.1 JavaDocs are not included.
+
+Example applications
+--------------------
+- The SDK does not contain any example MIDlets.
+
+S60 Tools
+---------
+- EcmtAgent_MIDP.sis is not signed. The EcmtAgent_MIDP.sis can be
+  self-signed with development keys, and then used only for diagnostics.
+  On-device debugging is not supported.
+- SIP Server Emulator can only be run in a two or more PCs
+  configuration.
+  PC1: S60 Emulator running Client application using SIP
+  PC2: S60 Emulator running Client application using SIP
+  SIP Server emulator running on PC1 or dedicated PC.
+  SIP Invitation can only be sent from PC2. SIP Server Emulator fails
+  to register invitations coming from S60 Emulator running on same PC
+  as the Server Emulator.
+- SIP Configuration: both SIP Registrar and SIP Proxy servers need to
+  be configured. Note that Proxy configuration is a mandatory step.
+  Otherwise SIP Server emulator connection can't be made.
+
+Copyright © 2001-2007 Nokia Corporation. All rights reserved. 
+Nokia and Nokia Connecting People are registered trademarks of 
+Nokia Corporation.
+
+
