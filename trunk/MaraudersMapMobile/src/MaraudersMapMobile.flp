@@ -1,4 +1,5 @@
 ﻿<flash_project name="MaraudersMapMobile" version="1">
     <project_file path="./App.fla" filetype="fla" profile="" def_file="true" />
     <project_file path="./mmm/App.as" filetype="as" />
+    <project_file path="./mmm/Map.as" filetype="as" />
 </flash_project>
