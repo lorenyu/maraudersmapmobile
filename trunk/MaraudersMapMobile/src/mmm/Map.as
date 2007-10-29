@@ -12,8 +12,8 @@ class mmm.Map extends MovieClip
 	public function Map()
 	{
 		trace("Map contructor");
-		this._xscale = 200.0;
-		this._yscale = 200.0;
+		this._xscale = 200.0; // in percent
+		this._yscale = 200.0; // in percent
 	}
 
 	public function loadMap(map:String)
@@ -34,12 +34,8 @@ class mmm.Map extends MovieClip
 			trace(target.gpsYMax);
 		}
 		clipLoader.addListener(listener);
+		// params: address, target movie to load to
 		clipLoader.loadClip("resources/" + map + "-lowquality.jpg", this);
-	}
-	
-	public function hello()
-	{
-		trace("hello");
 	}
 
 	/*

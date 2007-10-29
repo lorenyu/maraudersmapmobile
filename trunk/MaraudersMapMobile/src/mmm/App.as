@@ -11,7 +11,7 @@ class mmm.App extends MovieClip
 	
 	var gpsX:Number = 700;
 	var gpsY:Number = 1100;
-	var compassDirection:Number = 0;
+	var compassDirection:Number = 0; // in degrees (x-axis is 0)
 	var timer:Object = null;
 	var turn:Number = 0; // TODO: remove
 	
@@ -19,12 +19,14 @@ class mmm.App extends MovieClip
 	{
 		trace("App started");
 		
-		userIcon = this.attachMovie("UserIcon", "UserIcon", 999);
+		Key.addListener(this);
+		
+		userIcon = this.attachMovie("UserIcon", "userIcon", 999);
 		userIcon._x = this._width / 2;
 		userIcon._y = this._height / 2;
 		
 		// Create new instance of Map with instance name "map" at depth 100
-		map = Map(attachMovie("Map", "map", 100));
+		map = Map(this.attachMovie("Map", "map", 100));
 		//map = attachMovie("Map", "map", 100);
 		
 		run();
@@ -37,7 +39,7 @@ class mmm.App extends MovieClip
 		loadMap();
 		
 		// Need to pass this as an argument since setInterval(this, update, 500) doesn't work for Flash Lite 2.0
-		timer = setInterval(update, 500, this);
+		//timer = setInterval(update, 500, this);
 	}
 	
 	public function update(_this:MovieClip)
@@ -88,4 +90,32 @@ class mmm.App extends MovieClip
 		trace("loadMap tressider");
 		map.loadMap("tressider");
 	}
+	
+	public function onKeyDown()
+	{
+		switch(Key.getCode())
+		{
+			case Key.UP:
+				gpsX += 2 * Math.cos(compassDirection * Math.PI / 180);
+				gpsY += 2 * Math.sin(compassDirection * Math.PI / 180);
+				break;
+		
+			case Key.DOWN:
+				gpsX -= 2 * Math.cos(compassDirection * Math.PI / 180);
+				gpsY -= 2 * Math.sin(compassDirection * Math.PI / 180);
+				break;
+				
+			case Key.LEFT:
+				compassDirection += 3; // or 5!
+				if(compassDirection >= 360) compassDirection -= 360;
+				break;
+				
+			case Key.RIGHT:
+				compassDirection -= 3;
+				if(compassDirection <= 0) compassDirection += 360;
+				break;
+		}
+		this.updateMap();
+	}
+		
 }
