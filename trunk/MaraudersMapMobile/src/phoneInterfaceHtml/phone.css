@@ -12,10 +12,12 @@ body
 
 p
 {
-	font-size: 120%;
+	font-size: 1.2em;
 }
 
 a
 {
-	vertical-align: 50%;
+	/* text-decoration: none;
+	color: black; */
+	font-size: 1.2em;
 }
