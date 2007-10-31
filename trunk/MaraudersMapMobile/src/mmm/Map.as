@@ -28,6 +28,7 @@ class mmm.Map extends MovieClip
 			target.gpsYMin = 0;
 			target.gpsXMax = target._width;
 			target.gpsYMax = target._height;
+			target._parent.update();
 			trace(target.gpsXMin);
 			trace(target.gpsXMax);
 			trace(target.gpsYMin);
@@ -35,7 +36,7 @@ class mmm.Map extends MovieClip
 		}
 		clipLoader.addListener(listener);
 		// params: address, target movie to load to
-		clipLoader.loadClip("resources/" + map + "-lowquality.jpg", this);
+		clipLoader.loadClip("resources/" + map + "-medquality.jpg", this);
 	}
 
 	/*

@@ -7,6 +7,7 @@ class mmm.App extends MovieClip
 	// MovieClips
 	var userIcon:MovieClip = null;
 	var targetIcon:MovieClip = null;
+	var arrowIcon:MovieClip = null;
 	var map:Map = null;
 	
 	var gpsX:Number = 700;
@@ -15,18 +16,28 @@ class mmm.App extends MovieClip
 	var timer:Object = null;
 	var turn:Number = 0; // TODO: remove
 	
+	//temp vars
+	var targetX:Number = 750;
+	var targetY:Number = 1100;
+	
 	public function App()
 	{
 		trace("App started");
 		
 		Key.addListener(this);
 		
-		userIcon = this.attachMovie("UserIcon", "userIcon", 999);
+		userIcon = this.attachMovie("UserIcon", "userIcon", 9999);
 		userIcon._x = this._width / 2;
 		userIcon._y = this._height / 2;
 		
+		arrowIcon = this.attachMovie("Arrow", "arrow", 1000);
+		arrowIcon._x = 30;
+		arrowIcon._y = 30;
+		
+		targetIcon = this.attachMovie("TargetIcon", "target", 1001);
+		
 		// Create new instance of Map with instance name "map" at depth 100
-		map = Map(this.attachMovie("Map", "map", 100));
+		map = Map(this.attachMovie("Map", "map", 900));
 		//map = attachMovie("Map", "map", 100);
 		
 		run();
@@ -42,11 +53,13 @@ class mmm.App extends MovieClip
 		//timer = setInterval(update, 500, this);
 	}
 	
-	public function update(_this:MovieClip)
+	public function update()
 	{
 		trace("update");
-		_this.updateLocation();
-		_this.updateMap();
+		//_this.updateLocation();
+		this.updateMap();
+		this.updateArrow();
+		this.updateTarget();		
 	}
 	
 	public function updateLocation()
@@ -85,10 +98,35 @@ class mmm.App extends MovieClip
 		trace("new coords = (" + map._x + "," + map._y + "," + map._rotation + ")");
 	}
 	
+	public function updateArrow()
+	{
+		var dx:Number = targetX - gpsX;
+		var dy:Number = targetY - gpsY;
+		
+		var theta:Number = Math.atan2(dy, dx);
+		theta = theta*180/Math.PI;
+		
+		var dtheta:Number = compassDirection - theta;
+		arrowIcon._rotation = -90 + dtheta;	
+	}
+	
+	public function updateTarget()
+	{
+		var u:Number = gpsX - targetX;
+		var v:Number = targetY - gpsY;
+		var theta:Number = compassDirection * Math.PI / 180;
+		var dx:Number = v*Math.cos(theta) + u*Math.sin(theta);
+		var dy:Number = -u*Math.cos(theta) + v*Math.sin(theta);
+		
+		targetIcon._x = userIcon._x - dx;
+		targetIcon._y = userIcon._y - dy;	
+	}
+	
 	public function loadMap()
 	{
 		trace("loadMap tressider");
 		map.loadMap("tressider");
+		this.updateMap();
 	}
 	
 	public function onKeyDown()
@@ -115,7 +153,7 @@ class mmm.App extends MovieClip
 				if(compassDirection <= 0) compassDirection += 360;
 				break;
 		}
-		this.updateMap();
+		this.update();
 	}
 		
 }
