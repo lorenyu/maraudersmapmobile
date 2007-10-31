@@ -46,7 +46,7 @@ class mmm.App extends MovieClip
 	public function run()
 	{
 		trace("run");
-		updateLocation();
+		//updateLocation();
 		loadMap();
 		
 		// Need to pass this as an argument since setInterval(this, update, 500) doesn't work for Flash Lite 2.0
@@ -87,12 +87,16 @@ class mmm.App extends MovieClip
 		
 		var u:Number = gpsX - map.gpsXMin;
 		var v:Number = map.gpsYMax - gpsY;
-		var theta:Number = compassDirection * Math.PI / 180;
-		var dx:Number = v*Math.cos(theta) + u*Math.sin(theta);
-		var dy:Number = -u*Math.cos(theta) + v*Math.sin(theta);
+		var theta:Number = -compassDirection * Math.PI / 180;
+		trace("u: " + u + " v: " + v);
+		trace("theta: " + theta);
+		var dx:Number = v*Math.cos(theta) - u*Math.sin(theta);
+		var dy:Number = v*Math.sin(theta) + u*Math.cos(theta);
+		trace(dx);
+		trace(dy);
 		
 		map._x = userIcon._x - dx;
-		map._y = userIcon._y - dy;
+		map._y = userIcon._y + dy;
 		// In actionscript, positive angles represent clockwise rotation
 		map._rotation = -90 + compassDirection;
 		
@@ -115,19 +119,18 @@ class mmm.App extends MovieClip
 	{
 		var u:Number = gpsX - targetX;
 		var v:Number = targetY - gpsY;
-		var theta:Number = compassDirection * Math.PI / 180;
-		var dx:Number = v*Math.cos(theta) + u*Math.sin(theta);
-		var dy:Number = -u*Math.cos(theta) + v*Math.sin(theta);
+		var theta:Number = -compassDirection * Math.PI / 180;
+		var dx:Number = v*Math.cos(theta) - u*Math.sin(theta);
+		var dy:Number = v*Math.sin(theta) + u*Math.cos(theta) ;
 		
 		targetIcon._x = userIcon._x - dx;
-		targetIcon._y = userIcon._y - dy;	
+		targetIcon._y = userIcon._y + dy;	
 	}
 	
 	public function loadMap()
 	{
 		trace("loadMap tressider");
 		map.loadMap("tressider");
-		this.updateMap();
 	}
 	
 	public function onKeyDown()
