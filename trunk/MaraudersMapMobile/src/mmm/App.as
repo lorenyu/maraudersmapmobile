@@ -10,15 +10,15 @@ class mmm.App extends MovieClip
 	var arrowIcon:MovieClip = null;
 	var map:Map = null;
 	
-	var gpsX:Number = 700;
-	var gpsY:Number = 1100;
-	var compassDirection:Number = 0; // in degrees (x-axis is 0)
+	var gpsX:Number = 1005;
+	var gpsY:Number = 1075;
+	var compassDirection:Number = 90; // in degrees (x-axis is 0)
 	var timer:Object = null;
 	var turn:Number = 0; // TODO: remove
 	
 	//temp vars
-	var targetX:Number = 750;
-	var targetY:Number = 1100;
+	var targetX:Number = 798;
+	var targetY:Number = 1143;
 	
 	public function App()
 	{
@@ -77,7 +77,8 @@ class mmm.App extends MovieClip
 		gpsX += 2 * Math.cos(compassDirection * Math.PI / 180);
 		gpsY += 2 * Math.sin(compassDirection * Math.PI / 180);
 		
-		trace("new coords = (" + gpsX + "," + gpsY + "," + compassDirection + ")");
+		trace("user coords = (" + gpsX + "," + gpsY + "," + compassDirection + ")");
+
 	}
 	
 	public function updateMap()
@@ -95,7 +96,7 @@ class mmm.App extends MovieClip
 		// In actionscript, positive angles represent clockwise rotation
 		map._rotation = -90 + compassDirection;
 		
-		trace("new coords = (" + map._x + "," + map._y + "," + map._rotation + ")");
+		//trace("map coords = (" + map._x + "," + map._y + "," + map._rotation + ")");
 	}
 	
 	public function updateArrow()
@@ -153,6 +154,7 @@ class mmm.App extends MovieClip
 				if(compassDirection <= 0) compassDirection += 360;
 				break;
 		}
+		trace("user coords: (" + gpsX + ", " + gpsY + ")"); 
 		this.update();
 	}
 		
