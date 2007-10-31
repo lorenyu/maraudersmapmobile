@@ -29,10 +29,8 @@ class mmm.Map extends MovieClip
 			target.gpsXMax = target._width;
 			target.gpsYMax = target._height;
 			target._parent.update();
-			trace(target.gpsXMin);
-			trace(target.gpsXMax);
-			trace(target.gpsYMin);
-			trace(target.gpsYMax);
+			trace("gpsX: [" + target.gpsXMin + "," + target.gpsXMax + "]");
+			trace("gpsY: [" + target.gpsYMin + "," + target.gpsYMax + "]");
 		}
 		clipLoader.addListener(listener);
 		// params: address, target movie to load to
