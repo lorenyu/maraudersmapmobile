@@ -1,0 +1,21 @@
+body
+{
+	border: medium solid black;
+}
+
+.phone
+{
+	width: 176px;
+	height: 208px;
+	vertical-align: 100%;
+}
+
+p
+{
+	font-size: 120%;
+}
+
+a
+{
+	vertical-align: 50%;
+}
