@@ -8,6 +8,7 @@ class mmm.App extends MovieClip
 	var userIcon:MovieClip = null;
 	var targetIcon:MovieClip = null;
 	var arrowIcon:MovieClip = null;
+	var arrowLabel:MovieClip = null;
 	var map:Map = null;
 	
 	var gpsX:Number = 1005;
@@ -31,10 +32,18 @@ class mmm.App extends MovieClip
 		userIcon._y = this._height / 2;
 		
 		arrowIcon = this.attachMovie("Arrow", "arrow", 1000);
-		arrowIcon._x = 30;
-		arrowIcon._y = 30;
+		// x, y -5, 45 for screencapture
+		// x, y 40, 30 for mobile
+		arrowIcon._x = -5;
+		arrowIcon._y = 45;
 		
-		targetIcon = this.attachMovie("TargetIcon", "target", 1001);
+		arrowLabel = this.attachMovie("ArrowLabel", "arrowLabel", 1001);
+		// x, y, -40 for screencapture
+		// x, y 0, -10 for mobile
+		arrowLabel._x = -40;
+		arrowLabel._y = -40;
+		
+		targetIcon = this.attachMovie("TargetIcon", "target", 1002);
 		
 		// Create new instance of Map with instance name "map" at depth 100
 		map = Map(this.attachMovie("Map", "map", 900));
@@ -87,16 +96,12 @@ class mmm.App extends MovieClip
 		
 		var u:Number = gpsX - map.gpsXMin;
 		var v:Number = map.gpsYMax - gpsY;
-		var theta:Number = -compassDirection * Math.PI / 180;
-		trace("u: " + u + " v: " + v);
-		trace("theta: " + theta);
-		var dx:Number = v*Math.cos(theta) - u*Math.sin(theta);
-		var dy:Number = v*Math.sin(theta) + u*Math.cos(theta);
-		trace(dx);
-		trace(dy);
+		var theta:Number = compassDirection * Math.PI / 180;
+		var dx:Number = v*Math.cos(theta) + u*Math.sin(theta);
+		var dy:Number = -u*Math.cos(theta) + v*Math.sin(theta);
 		
 		map._x = userIcon._x - dx;
-		map._y = userIcon._y + dy;
+		map._y = userIcon._y - dy;
 		// In actionscript, positive angles represent clockwise rotation
 		map._rotation = -90 + compassDirection;
 		
@@ -119,12 +124,12 @@ class mmm.App extends MovieClip
 	{
 		var u:Number = gpsX - targetX;
 		var v:Number = targetY - gpsY;
-		var theta:Number = -compassDirection * Math.PI / 180;
-		var dx:Number = v*Math.cos(theta) - u*Math.sin(theta);
-		var dy:Number = v*Math.sin(theta) + u*Math.cos(theta) ;
+		var theta:Number = compassDirection * Math.PI / 180;
+		var dx:Number = v*Math.cos(theta) + u*Math.sin(theta);
+		var dy:Number = -u*Math.cos(theta) + v*Math.sin(theta);
 		
 		targetIcon._x = userIcon._x - dx;
-		targetIcon._y = userIcon._y + dy;	
+		targetIcon._y = userIcon._y - dy;	
 	}
 	
 	public function loadMap()
