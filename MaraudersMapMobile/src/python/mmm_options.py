@@ -8,7 +8,8 @@ def shareLocation():
     swfLoader = appuifw.Content_handler(swfLock.signal)
     swfLoader.open("E:\\Others\\App.swf")
     swfLock.wait()
-    appuifw.note(u"Location shared")
+    #e32.start_exe("E:\\Others\\App.swf", "")
+    #appuifw.note(u"Location shared")
 
 def quit():
     app_lock.signal()
