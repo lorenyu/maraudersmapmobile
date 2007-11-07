@@ -7,6 +7,7 @@ def drawIcons(canvas, targetLoc):
 	
 def addUserIcon(canvas):
 	w, h = canvas.size
+	print w, h
 	canvasMidX = w/2
 	canvasMidY = h/2
 	iconOffsets = getUserIconOffsets()
