@@ -17,6 +17,7 @@ def map_quit():
 def loading_quit():
     global loadCancelled
     loadCancelled = True
+    app.screen = 'normal'
     app.body = canvas
     app.exit_key_handler = quit
     app.title = title
@@ -25,7 +26,7 @@ def loading_quit():
 def loadMap():
     print "mmm_mapui"
     global loadCancelled
-    
+    app.screen = 'large'
     app.body = loading_canvas
     loading_canvas.clear((255, 255, 255))
     loading_canvas.blit(loading_image)
@@ -33,19 +34,23 @@ def loadMap():
     app.exit_key_handler = loading_quit
     loadCancelled = False
     
-    ao_sleep(3)
+    ao_sleep(1)
     if not loadCancelled:
+        app.screen = 'full'
         app.exit_key_handler = map_quit
         app.body = map_canvas
         app.title = map_title
         app.menu = map_options
         map_canvas.clear((255,255,255))
-            
-        map_canvas.blit(map.image)
+        
+        
+        map_canvas.blit(map.overlay)
+        map_canvas.blit(map.image, mask = map.overlay_mask)
+        
         #iconsMod.drawIcons(canvas, targetLoc)
         
         map_lock.wait()
-        
+        app.screen = 'normal'
         app.body = canvas
         app.exit_key_handler = quit
         app.title = title
@@ -58,7 +63,8 @@ def quit():
     app_lock.signal()
 
 def map_redraw(rect):
-    map_canvas.blit(map.image)
+    map_canvas.blit(map.overlay)
+    map_canvas.blit(map.image, mask = map.overlay_mask)
     
 def redraw(rect):
     canvas.blit(image)
