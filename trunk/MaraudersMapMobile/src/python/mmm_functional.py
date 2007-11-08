@@ -2,8 +2,21 @@ from appuifw import *
 from e32 import *
 from graphics import *
 from mmm_map import *
+from key_codes import *
+
+import positioning
 
 # Map elements
+
+userX = -122.170715
+userY = 37.424196
+
+gpsX_per_pixel = 0.00000537
+gpsY_per_pixel = -0.00000427
+
+pixels_per_gpsX = 186220
+pixels_per_gpsY = -234192
+
 
 #userLoc = userLocMod.UserLoc(1005, 1075, 90)
 #targetLoc = targetLocMod.TargetLoc(130, 200)
@@ -12,6 +25,7 @@ def doNothing():
     print "Do nothing"
 
 def map_quit():
+    positioning.stop_position()
     map_lock.signal()
 
 def loading_quit():
@@ -44,9 +58,9 @@ def loadMap():
         map_canvas.clear((255,255,255))
         
         
-        map_canvas.blit(map.overlay)
-        map_canvas.blit(map.image, mask = map.overlay_mask)
-        
+        map_canvas.blit(map.image)
+        map_canvas.blit(map.overlay, mask = map.overlay_mask)
+                
         #iconsMod.drawIcons(canvas, targetLoc)
         
         map_lock.wait()
@@ -63,12 +77,53 @@ def quit():
     app_lock.signal()
 
 def map_redraw(rect):
-    map_canvas.blit(map.overlay)
-    map_canvas.blit(map.image, mask = map.overlay_mask)
+    dx = (userX - map.coords['gpsXMin']) * pixels_per_gpsX
+    dy = (userY - map.coords['gpsYMax']) * pixels_per_gpsY
     
+    w, h = map_canvas.size
+    map.x = w/2 - dx
+    map.y = h/2 - dy
+    
+    map_canvas.blit(map.image, target = (map.x, map.y))
+    map_canvas.blit(map.overlay, mask = map.overlay_mask)
+        
 def redraw(rect):
     canvas.blit(image)
+    
+def zoom_in():
+    if map.zoom > 2.5:
+        map.zoom = 2.5
+        return
+    w, h = map.orig_image.size
+    map.zoom = map.zoom + 0.2
+    map.image = map.orig_image.resize((map.zoom*w, map.zoom*h))
+    map_redraw(None)
 
+def zoom_out():
+    if map.zoom < 0.3:
+        map.zoom = 0.2
+        return
+    w, h = map.orig_image.size    
+    map.zoom = map.zoom - 0.2
+    map.image = map.orig_image.resize((map.zoom*w, map.zoom*h))
+    map_redraw(None)
+
+def pan_up():
+    map.y = map.y + 10
+    map_redraw(None)
+
+def pan_down():
+    map.y = map.y - 10
+    map_redraw(None)
+    
+def pan_left():
+    map.x = map.x + 10
+    map_redraw(None)
+    
+def pan_right():
+    map.x = map.x - 10
+    map_redraw(None)
+    
 # Map
 map_canvas = Canvas(redraw_callback = map_redraw)
 map_title = u"Map UI"
@@ -77,6 +132,12 @@ map_options = [
     (u"Zoom out (#)", doNothing),
     (u"Satellite info", doNothing)]
 map_lock = Ao_lock()    
+map_canvas.bind(EKeyStar, zoom_in)
+map_canvas.bind(EKeyHash, zoom_out)
+map_canvas.bind(EKeyUpArrow, pan_up)
+map_canvas.bind(EKeyDownArrow, pan_down)
+map_canvas.bind(EKeyLeftArrow, pan_left)
+map_canvas.bind(EKeyRightArrow, pan_right)
 map = Map()
 
 # Loading

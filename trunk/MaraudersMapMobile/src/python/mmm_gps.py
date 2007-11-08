@@ -4,17 +4,12 @@
 
 import positioning
 
-class Gps:
-    def __init__(self):
-        positioning.set_requestors([{
-            "type" : "service",
-            "format" : "application",
-            "data"   : "test_app"}])
-        positioning.position(course = 1, callback = updatePosition, interval = 500000)
-    
-    def __del__(self):
-        print "Stopping GPS"
-        stop_position()
+
+positioning.set_requestors([{
+    "type" : "service",
+    "format" : "application",
+    "data"   : "test_app"}])
+positioning.position(course = 1, callback = updatePosition, interval = 500000)
 
     def updatePosition(event):
         positionInfo = event['position']
