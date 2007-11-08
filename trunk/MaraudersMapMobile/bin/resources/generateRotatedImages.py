@@ -4,5 +4,6 @@ imageFile = 'gates.png'
 numRotations = 16
 
 image = Image.open('gates.png')
-for i in range(16):
+degrees = 360 / numRotations
+for i in range(numRotations):
     image.rotate(i * degrees).save('gates_' + ('%03i' % (i * degrees)) + '.jpg')
