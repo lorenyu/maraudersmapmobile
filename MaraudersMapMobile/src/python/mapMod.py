@@ -4,7 +4,8 @@ from graphics import *
 class Map:
 	
 	def __init__(self):
-		self.image = Image.open("C:\\Data\\Images\\tressider-lowquality.jpg")
+		#self.image = Image.open("C:\\Data\\Images\\tressider-lowquality.jpg")
+        self.image = Image.open("C:\\Data\\Images\\mapui1.jpg")
 		# read this in from text file - can eval(text), and then have a dictionary
 		f = file(u"C:\\Data\\Others\\tressider2-coords.txt", "r")
 		str = ""
