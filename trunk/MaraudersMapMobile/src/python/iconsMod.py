@@ -5,8 +5,7 @@ from math import sin, cos, pi
 def drawIcons(canvas, targetLoc, arrowLoc):
 	addUserIcon(canvas)
 	drawTargetIcon(canvas, targetLoc)
-	drawArrowIcon(canvas, arrowLoc)
-	#updateArrowIcon(canvas, arrowLoc, pi/3)
+	drawArrowIcon(canvas, arrowLoc, deltaTheta)
 	
 def addUserIcon(canvas):
 	w, h = canvas.size
@@ -30,23 +29,23 @@ def drawTargetIcon(canvas, targLoc):
 	canvas.polygon(vertices, outline = colorMod.BLACK, fill = colorMod.GREEN, width = 2) 
 	canvas.text((cx - 14, cy + 37), u"Andy", fill = colorMod.WHITE)
 
-def drawArrowIcon(canvas, arrowLoc):
-        cx = arrowLoc.x
-        cy = arrowLoc.y
-        iconOffsets = getArrowIconOffsets()
-        vertices = []
+#def drawArrowIcon(canvas, arrowLoc):
+ #       cx = arrowLoc.x
+  #      cy = arrowLoc.y
+   #     iconOffsets = getArrowIconOffsets()
+    #    vertices = []
         
         #testCoords = map(rotate, getArrowIconOffsets())
         
-        for i in range(0, 7):
-                vertices.append(((cx + iconOffsets[i][0]), (cy + iconOffsets[i][1])))
+     #   for i in range(0, 7):
+      #          vertices.append(((cx + iconOffsets[i][0]), (cy + iconOffsets[i][1])))
         
-        canvas.polygon(vertices, outline = colorMod.BLACK, fill = colorMod.GREEN, width = 2)
+       # canvas.polygon(vertices, outline = colorMod.BLACK, fill = colorMod.GREEN, width = 2)
         
         #INSERT TEXT HERE (CALLEE'S NAME):)
 
 
-def updateArrowIcon(canvas, arrowLoc, theta): #theta or delta theta?
+def drawArrowIcon(canvas, arrowLoc, theta): #theta or delta theta?
         cx = arrowLoc.x
         cy = arrowLoc.y
         iconOffsets = getArrowIconOffsets()
