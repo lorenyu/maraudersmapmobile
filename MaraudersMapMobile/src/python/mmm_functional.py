@@ -10,6 +10,8 @@ import positioning
 
 userX = -122.170715
 userY = 37.424196
+panX = 0
+panY = 0
 
 gpsX_per_pixel = 0.00000537
 gpsY_per_pixel = -0.00000427
@@ -81,11 +83,12 @@ def map_redraw(rect):
     dy = (userY - map.coords['gpsYMax']) * pixels_per_gpsY
     
     w, h = map_canvas.size
-    map.x = w/2 - dx
-    map.y = h/2 - dy
+    map.x = w/2 - dx + panX
+    map.y = h/2 - dy + panY
     
     map_canvas.blit(map.image, target = (map.x, map.y))
     map_canvas.blit(map.overlay, mask = map.overlay_mask)
+    map_canvas.blit(user_icon, mask = user_icon_mask, target = (w/2 + panX, h/2 + panY))
         
 def redraw(rect):
     canvas.blit(image)
@@ -109,19 +112,23 @@ def zoom_out():
     map_redraw(None)
 
 def pan_up():
-    map.y = map.y + 10
+    global panY
+    panY = panY + 10
     map_redraw(None)
 
 def pan_down():
-    map.y = map.y - 10
+    global panY
+    panY = panY- 10
     map_redraw(None)
     
 def pan_left():
-    map.x = map.x + 10
+    global panX
+    panX = panX + 10
     map_redraw(None)
     
 def pan_right():
-    map.x = map.x - 10
+    global panX
+    panX = panX - 10
     map_redraw(None)
     
 # Map
@@ -158,7 +165,12 @@ options = [
         (u"Hold", doNothing),
         (u"Share Location", loadMap)]
 app_lock = Ao_lock()
- 
+
+user_icon = Image.open("C:\\Data\\Images\\userIcon.jpg")
+user_icon_mask = Image.new(user_icon.size, mode = 'L')
+user_icon_mask.blit(Image.open("C:\\Data\\Images\\userIcon_mask.jpg"))
+
+
 print "mmm_talking"
 app.body = canvas
 app.exit_key_handler = quit
