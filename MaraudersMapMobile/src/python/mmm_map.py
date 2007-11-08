@@ -15,7 +15,7 @@ class Map:
     def __init__(self):
         try:
             print "Loading map image"
-            self.image = Image.open("C:\\Data\\Images\\tressider2-medquality.jpg")
+            self.image = Image.open("C:\\Data\\Images\\gates_000.jpg")
             self.orig_image = self.image
             self.zoom = 1
             self.x = 0
@@ -25,7 +25,7 @@ class Map:
             self.overlay_mask.blit(Image.open("C:\\Data\\Images\\mapui1_mask.jpg"))
             
             print "Loading map coords"
-            f = file(u"C:\\Data\\Others\\tressider2-coords.txt", "r")
+            f = file(u"C:\\Data\\Others\\gates_coords.txt", "r")
             str = ""
             for line in f:
                 str += line.strip()

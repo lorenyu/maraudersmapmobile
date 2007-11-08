@@ -8,8 +8,14 @@ import positioning
 
 # Map elements
 
-userX = -122.170715
-userY = 37.424196
+#userX = -122.170715
+#userY = 37.424196
+userX = -122.173156
+userY = 37.429900
+
+targetX = -122.173424
+targetY = 37.430778
+
 panX = 0
 panY = 0
 
@@ -50,7 +56,8 @@ def loadMap():
     app.exit_key_handler = loading_quit
     loadCancelled = False
     
-    ao_sleep(1)
+    ao_sleep(2)
+    
     if not loadCancelled:
         app.screen = 'full'
         app.exit_key_handler = map_quit
@@ -59,10 +66,8 @@ def loadMap():
         app.menu = map_options
         map_canvas.clear((255,255,255))
         
-        
-        map_canvas.blit(map.image)
-        map_canvas.blit(map.overlay, mask = map.overlay_mask)
-                
+        map_redraw(None)
+                       
         #iconsMod.drawIcons(canvas, targetLoc)
         
         map_lock.wait()
@@ -82,13 +87,20 @@ def map_redraw(rect):
     dx = (userX - map.coords['gpsXMin']) * pixels_per_gpsX
     dy = (userY - map.coords['gpsYMax']) * pixels_per_gpsY
     
+    targ_dx = (targetX - userX) * pixels_per_gpsX
+    targ_dy = (targetY - userY) * pixels_per_gpsY
+    
     w, h = map_canvas.size
     map.x = w/2 - dx + panX
     map.y = h/2 - dy + panY
     
+    iconW, iconH = user_icon.size
+    targW, targH = target_icon.size
+    
     map_canvas.blit(map.image, target = (map.x, map.y))
     map_canvas.blit(map.overlay, mask = map.overlay_mask)
-    map_canvas.blit(user_icon, mask = user_icon_mask, target = (w/2 + panX, h/2 + panY))
+    map_canvas.blit(user_icon, mask = user_icon_mask, target = (w/2 - iconW/2 + panX, h/2 - iconH/3 + panY))
+    map_canvas.blit(target_icon, mask = target_icon_mask, target = (w/2 - targW/2 +targ_dx + panX, h/2 - targH/2 + targ_dy + panY))
         
 def redraw(rect):
     canvas.blit(image)
@@ -135,9 +147,9 @@ def pan_right():
 map_canvas = Canvas(redraw_callback = map_redraw)
 map_title = u"Map UI"
 map_options = [
-    (u"Zoom in (*)", doNothing),
-    (u"Zoom out (#)", doNothing),
-    (u"Satellite info", doNothing)]
+    (u"Zoom in (*)", zoom_in),
+    (u"Zoom out (#)", zoom_out)]
+    #(u"Satellite info", doNothing)]
 map_lock = Ao_lock()    
 map_canvas.bind(EKeyStar, zoom_in)
 map_canvas.bind(EKeyHash, zoom_out)
@@ -170,6 +182,9 @@ user_icon = Image.open("C:\\Data\\Images\\userIcon.jpg")
 user_icon_mask = Image.new(user_icon.size, mode = 'L')
 user_icon_mask.blit(Image.open("C:\\Data\\Images\\userIcon_mask.jpg"))
 
+target_icon = Image.open("C:\\Data\\Images\\star1.jpg")
+target_icon_mask = Image.new(target_icon.size, mode = 'L')
+target_icon_mask.blit(Image.open("C:\\Data\\Images\\star_mask.jpg"))
 
 print "mmm_talking"
 app.body = canvas
