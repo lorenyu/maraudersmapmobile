@@ -16,6 +16,23 @@ userY = 37.429900
 targetX = -122.173424
 targetY = 37.430778
 
+
+def updatePosition(event):
+    global userX
+    global userY
+    positionInfo = event['position']
+    courseInfo = event['course']
+    userY = positionInfo['latitude']
+    userX = positionInfo['longitude']
+    map_redraw(None)
+
+if (not(in_emulator())):
+    positioning.set_requestors([{
+        "type" : "service",
+        "format" : "application",
+        "data"   : "test_app"}])
+    positioning.position(course = 1, callback = updatePosition, interval = 500000)
+    
 panX = 0
 panY = 0
 
