@@ -73,7 +73,7 @@ def loadMap():
     app.exit_key_handler = loading_quit
     loadCancelled = False
     
-    ao_sleep(2)
+    ao_sleep(0.5)
     
     if not loadCancelled:
         app.screen = 'full'
@@ -101,23 +101,23 @@ def quit():
     app_lock.signal()
 
 def map_redraw(rect):
-    dx = (userX - map.coords['gpsXMin']) * pixels_per_gpsX
-    dy = (userY - map.coords['gpsYMax']) * pixels_per_gpsY
+    dx = (userX - map.coords['gpsXMin']) * (pixels_per_gpsX * map.zoom)
+    dy = (userY - map.coords['gpsYMax']) * (pixels_per_gpsY * map.zoom)
     
-    targ_dx = (targetX - userX) * pixels_per_gpsX
-    targ_dy = (targetY - userY) * pixels_per_gpsY
+    targ_dx = (targetX - userX) * (pixels_per_gpsX * map.zoom)
+    targ_dy = (targetY - userY) * (pixels_per_gpsY * map.zoom)
     
     w, h = map_canvas.size
-    map.x = w/2 - dx + panX
-    map.y = h/2 - dy + panY
+    map.x = w/2 - dx + (panX * map.zoom)
+    map.y = h/2 - dy + (panY * map.zoom)
     
     iconW, iconH = user_icon.size
     targW, targH = target_icon.size
     
     map_canvas.blit(map.image, target = (map.x, map.y))
     map_canvas.blit(map.overlay, mask = map.overlay_mask)
-    map_canvas.blit(user_icon, mask = user_icon_mask, target = (w/2 - iconW/2 + panX, h/2 - iconH/3 + panY))
-    map_canvas.blit(target_icon, mask = target_icon_mask, target = (w/2 - targW/2 +targ_dx + panX, h/2 - targH/2 + targ_dy + panY))
+    map_canvas.blit(user_icon, mask = user_icon_mask, target = (w/2 - iconW/2 + (panX * map.zoom), h/2 - iconH/3 + (panY * map.zoom)))
+    map_canvas.blit(target_icon, mask = target_icon_mask, target = (w/2 - targW/2 +targ_dx + (panX * map.zoom), h/2 - targH/2 + targ_dy + (panY * map.zoom)))
         
 def redraw(rect):
     canvas.blit(image)
