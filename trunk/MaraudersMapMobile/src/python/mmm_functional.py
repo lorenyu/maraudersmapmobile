@@ -16,6 +16,8 @@ userY = 37.429900
 targetX = -122.173424
 targetY = 37.430778
 
+allowShare = False  
+
 
 def updatePosition(event):
     global userX
@@ -42,17 +44,15 @@ gpsY_per_pixel = -0.00000427
 pixels_per_gpsX = 186220
 pixels_per_gpsY = -234192
 
-
 #userLoc = userLocMod.UserLoc(1005, 1075, 90)
 #targetLoc = targetLocMod.TargetLoc(130, 200)
 
 def doNothing():
     print "Do nothing"
 
-def map_quit():
-    positioning.stop_position()
-    map_lock.signal()
-
+def loading_redraw(rect):
+    loading_canvas.blit(loading_image)
+    
 def loading_quit():
     global loadCancelled
     loadCancelled = True
@@ -65,6 +65,8 @@ def loading_quit():
 def loadMap():
     print "mmm_mapui"
     global loadCancelled
+    global panX
+    global panY
     app.screen = 'large'
     app.body = loading_canvas
     loading_canvas.clear((255, 255, 255))
@@ -81,24 +83,21 @@ def loadMap():
         app.body = map_canvas
         app.title = map_title
         app.menu = map_options
-        map_canvas.clear((255,255,255))
+        #map_canvas.clear((255,255,255))
         
+        map.zoom = 1
+        panX = 0
+        panY = 0
+        w, h = map.orig_image.size
+        map.image = map.orig_image.resize((w, h))
         map_redraw(None)
                        
-        #iconsMod.drawIcons(canvas, targetLoc)
-        
         map_lock.wait()
         app.screen = 'normal'
         app.body = canvas
         app.exit_key_handler = quit
         app.title = title
         app.menu = options
-    
-def loading_redraw(rect):
-    loading_canvas.blit(loading_image)
-    
-def quit():
-    app_lock.signal()
 
 def map_redraw(rect):
     dx = (userX - map.coords['gpsXMin']) * (pixels_per_gpsX * map.zoom)
@@ -114,14 +113,22 @@ def map_redraw(rect):
     iconW, iconH = user_icon.size
     targW, targH = target_icon.size
     
-    map_canvas.blit(map.image, target = (map.x, map.y))
-    map_canvas.blit(map.overlay, mask = map.overlay_mask)
+    map_canvas.blit(map.image, target = (map.x, map.y))    
     map_canvas.blit(user_icon, mask = user_icon_mask, target = (w/2 - iconW/2 + (panX * map.zoom), h/2 - iconH/3 + (panY * map.zoom)))
     map_canvas.blit(target_icon, mask = target_icon_mask, target = (w/2 - targW/2 +targ_dx + (panX * map.zoom), h/2 - targH/2 + targ_dy + (panY * map.zoom)))
-        
+    map_canvas.blit(map.overlay, mask = map.overlay_mask)   
+
+def map_quit():
+    positioning.stop_position()
+    map_lock.signal()
+    
 def redraw(rect):
     canvas.blit(image)
+
+def quit():
+    app_lock.signal() 
     
+# User manipulations   
 def zoom_in():
     if map.zoom > 2.5:
         map.zoom = 2.5
@@ -160,6 +167,32 @@ def pan_right():
     panX = panX - 10
     map_redraw(None)
     
+# instead of doing ao_sleep, the socket connection just has to call this fn    
+def promptToShare():
+    app.screen = 'full'
+    app.body = prompting_canvas
+    prompting_redraw(None)
+    app.menu = prompting_options
+    app.exit_key_handler = prompting_quit
+    
+    prompting_lock.wait()
+    if allowShare:
+        loadMap()
+  
+def temp():
+    global allowShare
+    allowShare = True
+    prompting_lock.signal()
+    
+def prompting_redraw(rect):
+    prompting_canvas.blit(prompting_image)
+    
+def prompting_quit():
+    global allowShare
+    allowShare = False
+    prompting_lock.signal()
+    loading_quit()
+    
 # Map
 map_canvas = Canvas(redraw_callback = map_redraw)
 map_title = u"Map UI"
@@ -184,6 +217,13 @@ loading_options = [
     (u"Loud Speaker", doNothing),
     (u"Hold", doNothing)]
 loadingCancelled = False    
+
+# Prompting
+prompting_image = Image.open("C:\\Data\\Images\\promptingToShare.jpg")
+prompting_canvas = Canvas(redraw_callback = prompting_redraw)
+prompting_canvas.bind(EKeyLeftSoftkey, temp)
+prompting_options = [(u"Temp", temp)]
+prompting_lock = Ao_lock()
 
 # Talking
 canvas = Canvas(redraw_callback = redraw)
@@ -213,4 +253,6 @@ print "Loading image talking1.jpg"
 image = Image.open("C:\\Data\\Images\\talking1.jpg")
 canvas.blit(image)
 
+ao_sleep(0.5)
+promptToShare()
 app_lock.wait()
