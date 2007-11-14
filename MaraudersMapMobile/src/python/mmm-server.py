@@ -37,6 +37,10 @@ def west():
     global direction
     direction = "west"
     sendDirection()
+ 
+def prompt():
+    print "sending prompt"
+    connection.send("prompt to share")
     
 def quit():
     print "Closing connection"
@@ -50,6 +54,7 @@ keymap = {
     65  : west,  # A
     83  : south, # S
     68  : east,  # D
+    80  : prompt, #P
     27  : quit}  # Esc
 
 # Keyboard handler
