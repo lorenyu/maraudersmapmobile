@@ -116,6 +116,11 @@ def map_redraw(rect):
     map_canvas.blit(map.image, target = (map.x, map.y))    
     map_canvas.blit(user_icon, mask = user_icon_mask, target = (w/2 - iconW/2 + (panX * map.zoom), h/2 - iconH/3 + (panY * map.zoom)))
     map_canvas.blit(target_icon, mask = target_icon_mask, target = (w/2 - targW/2 +targ_dx + (panX * map.zoom), h/2 - targH/2 + targ_dy + (panY * map.zoom)))
+    #map_canvas.blit(onebars_icon, mask = onebars_icon_mask, target = (184, 2))
+    #map_canvas.blit(twobars_icon, mask = twobars_icon_mask, target = (184, 2))
+    #map_canvas.blit(threebars_icon, mask = threebars_icon_mask, target = (184, 2))
+    #map_canvas.blit(fourbars_icon, mask = fourbars_icon_mask, target = (184, 2))
+    map_canvas.blit(fivebars_icon, mask = fivebars_icon_mask, target = (184, 2))
     map_canvas.blit(map.overlay, mask = map.overlay_mask)   
 
 def map_quit():
@@ -242,6 +247,26 @@ user_icon_mask.blit(Image.open("C:\\Data\\Images\\userIcon_mask.jpg"))
 target_icon = Image.open("C:\\Data\\Images\\star1.jpg")
 target_icon_mask = Image.new(target_icon.size, mode = 'L')
 target_icon_mask.blit(Image.open("C:\\Data\\Images\\star_mask.jpg"))
+
+onebars_icon = Image.open("C:\\Data\\Images\\1bars.jpg")
+onebars_icon_mask = Image.new(onebars_icon.size, mode = 'L')
+onebars_icon_mask.blit(Image.open("C:\\Data\\Images\\1bars_mask.jpg"))
+
+twobars_icon = Image.open("C:\\Data\\Images\\2bars.jpg")
+twobars_icon_mask = Image.new(twobars_icon.size, mode = 'L')
+twobars_icon_mask.blit(Image.open("C:\\Data\\Images\\2bars_mask.jpg"))
+
+threebars_icon = Image.open("C:\\Data\\Images\\3bars.jpg")
+threebars_icon_mask = Image.new(threebars_icon.size, mode = 'L')
+threebars_icon_mask.blit(Image.open("C:\\Data\\Images\\3bars_mask.jpg"))
+
+fourbars_icon = Image.open("C:\\Data\\Images\\4bars.jpg")
+fourbars_icon_mask = Image.new(fourbars_icon.size, mode = 'L')
+fourbars_icon_mask.blit(Image.open("C:\\Data\\Images\\4bars_mask.jpg"))
+
+fivebars_icon = Image.open("C:\\Data\\Images\\5bars.jpg")
+fivebars_icon_mask = Image.new(fivebars_icon.size, mode = 'L')
+fivebars_icon_mask.blit(Image.open("C:\\Data\\Images\\5bars_mask.jpg"))
 
 print "mmm_talking"
 app.body = canvas

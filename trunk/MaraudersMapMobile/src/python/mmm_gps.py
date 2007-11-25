@@ -16,6 +16,9 @@ positioning.position(course = 1, callback = updatePosition, interval = 500000)
         courseInfo = event['course']
         print '(lat,lon) = (%.3f, %.3f)' %(positionInfo['latitude'], positionInfo['longitude'])
         print 'heading = %.3f' %(courseInfo['heading'])
+        # ----Marcia's code starts here!----
+        print 'horizontal_accuracy = %.3f' %(positionInfo['horizontal_accuracy'])
+        # ----Marcia's code ends here!----
 
 
 #
