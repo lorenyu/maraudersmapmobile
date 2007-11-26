@@ -3,29 +3,30 @@ from e32 import *
 from graphics import *
 from mmm_map import *
 from key_codes import *
+from arrowLocMod import *
+from math import sin, cos, pi, atan2
 
 import positioning
 
 # Map elements
 
-#userX = -122.170715
-#userY = 37.424196
-userX = -122.173156
-userY = 37.429900
+#userGpsX = -122.170715
+#userGpsY = 37.424196
+userGpsX = -122.173156
+userGpsY = 37.429900
 
-targetX = -122.173424
-targetY = 37.430778
+targetGpsX = -122.173424
+targetGpsY = 37.430778
 
 allowShare = False  
 
-
 def updatePosition(event):
-    global userX
-    global userY
+    global userGpsX
+    global userGpsY
     positionInfo = event['position']
     courseInfo = event['course']
-    userY = positionInfo['latitude']
-    userX = positionInfo['longitude']
+    userGpsY = positionInfo['latitude']
+    userGpsX = positionInfo['longitude']
     map_redraw(None)
 
 if (not(in_emulator())):
@@ -46,6 +47,7 @@ pixels_per_gpsY = -234192
 
 #userLoc = userLocMod.UserLoc(1005, 1075, 90)
 #targetLoc = targetLocMod.TargetLoc(130, 200)
+arrowLoc = ArrowLoc(30, 30, 10)
 
 def doNothing():
     print "Do nothing"
@@ -100,11 +102,11 @@ def loadMap():
         app.menu = options
 
 def map_redraw(rect):
-    dx = (userX - map.coords['gpsXMin']) * (pixels_per_gpsX * map.zoom)
-    dy = (userY - map.coords['gpsYMax']) * (pixels_per_gpsY * map.zoom)
+    dx = (userGpsX - map.coords['gpsXMin']) * (pixels_per_gpsX * map.zoom)
+    dy = (userGpsY - map.coords['gpsYMax']) * (pixels_per_gpsY * map.zoom)
     
-    targ_dx = (targetX - userX) * (pixels_per_gpsX * map.zoom)
-    targ_dy = (targetY - userY) * (pixels_per_gpsY * map.zoom)
+    targ_dx = (targetGpsX - userGpsX) * (pixels_per_gpsX * map.zoom)
+    targ_dy = (targetGpsY - userGpsY) * (pixels_per_gpsY * map.zoom)
     
     w, h = map_canvas.size
     map.x = w/2 - dx + (panX * map.zoom)
@@ -122,6 +124,8 @@ def map_redraw(rect):
     #map_canvas.blit(fourbars_icon, mask = fourbars_icon_mask, target = (184, 2))
     map_canvas.blit(fivebars_icon, mask = fivebars_icon_mask, target = (184, 2))
     map_canvas.blit(map.overlay, mask = map.overlay_mask)   
+    arrowLoc.theta = atan2(-(targetGpsY - userGpsY), targetGpsX - userGpsX)
+    arrowLoc.draw(map_canvas)
 
 def map_quit():
     positioning.stop_position()
@@ -174,6 +178,7 @@ def pan_right():
     
 # instead of doing ao_sleep, the socket connection just has to call this fn    
 def promptToShare():
+    ao_sleep(30)
     app.screen = 'full'
     app.body = prompting_canvas
     prompting_redraw(None)
@@ -227,22 +232,22 @@ loadingCancelled = False
 prompting_image = Image.open("C:\\Data\\Images\\promptingToShare.jpg")
 prompting_canvas = Canvas(redraw_callback = prompting_redraw)
 prompting_canvas.bind(EKeyLeftSoftkey, temp)
-prompting_options = [(u"Temp", temp)]
+prompting_options = [(u"Confirm", temp)]
 prompting_lock = Ao_lock()
 
 # Talking
 canvas = Canvas(redraw_callback = redraw)
 title = u"Talking"
 options = [
-        (u"Mute", doNothing),
+        (u"Mute", promptToShare),
         (u"Loud Speaker", doNothing),
         (u"Hold", doNothing),
         (u"Share Location", loadMap)]
 app_lock = Ao_lock()
 
-user_icon = Image.open("C:\\Data\\Images\\userIcon.jpg")
+user_icon = Image.open("C:\\Data\\Images\\userIconCircle.jpg")
 user_icon_mask = Image.new(user_icon.size, mode = 'L')
-user_icon_mask.blit(Image.open("C:\\Data\\Images\\userIcon_mask.jpg"))
+user_icon_mask.blit(Image.open("C:\\Data\\Images\\userIconCircle_mask.jpg"))
 
 target_icon = Image.open("C:\\Data\\Images\\star1.jpg")
 target_icon_mask = Image.new(target_icon.size, mode = 'L')
@@ -278,6 +283,4 @@ print "Loading image talking1.jpg"
 image = Image.open("C:\\Data\\Images\\talking1.jpg")
 canvas.blit(image)
 
-ao_sleep(0.5)
-promptToShare()
 app_lock.wait()
