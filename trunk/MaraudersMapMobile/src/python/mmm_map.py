@@ -2,9 +2,11 @@ from appuifw import *
 from graphics import *
 from e32 import *
 
-class Map:
+class MapUI:
     def __init__(self):
         try:
+            self.menu = [(u"Zoom in (*)", zoom_in),
+                         (u"Zoom out (#)", zoom_out)]
             print "Loading map image"
             self.image = Image.open("C:\\Data\\Images\\gates_000.jpg")
             self.orig_image = self.image
@@ -14,6 +16,9 @@ class Map:
             self.overlay = Image.open("C:\\Data\\Images\\mapui1.jpg")
             self.overlay_mask = Image.new(self.overlay.size, mode = 'L')
             self.overlay_mask.blit(Image.open("C:\\Data\\Images\\mapui1_mask.jpg"))
+            self.northIcon = Image.open("C:\\Data\\Images\\northIcon.jpg")
+            self.northIcon_mask = Image.new(self.northIcon.size, mode = 'L')
+            self.northIcon_mask.blit(Image.open("C:\\Data\\Images\\northIcon_mask.jpg"))
             
             print "Loading map coords"
             f = file(u"C:\\Data\\Others\\gates_coords.txt", "r")
@@ -29,4 +34,4 @@ class Map:
         print "Map constructor"
         
 if __name__ == "__main__":
-    map = Map()
+    map = MapUI()

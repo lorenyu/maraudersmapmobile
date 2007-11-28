@@ -1,41 +1,176 @@
+# mmm_mapUI.py
+
 from appuifw import *
+from graphics import *
 from e32 import *
+from key_codes import *
+from mmm_utils import *
+from mmm_gps import *
+from mmm_targetArrow import *
+from mmm_icons import *
+from math import sin, cos, pi, atan2
 
-from mmm_map import *
-import mmm_util
+class MapUI:
+    def __init__(self):
+        def zoom_in():
+            self.setZoom(self.zoom + 0.2)
 
-def doNothing():
-    note(u"Sorry can't do that!")
+        def zoom_out():
+            self.setZoom(self.zoom - 0.2)
+        
+        def recenter():
+            self.panX = 0
+            self.panY = 0
+            app.redraw(None)
+            
+        def pan_up():
+            self.panY = self.panY + 10
+            app.redraw(None)
 
-def quit():
-    app_lock.signal()
-
-def main():
-    mmm_util.saveAppState()
-    print "mmm_mapui"
-    app.body = canvas
-    app.exit_key_handler = quit
-    app.title = u"Map UI"
-    app.menu = options
-    app_lock.wait()
+        def pan_down():
+            self.panY = self.panY- 10
+            app.redraw(None)
+                    
+        def pan_left():
+            self.panX = self.panX + 10
+            app.redraw(None)
+                    
+        def pan_right():
+            self.panX = self.panX - 10
+            app.redraw(None)
     
-    #canvas.blit(map.image)
-    #iconsMod.drawIcons(canvas, targetLoc)
-    mmm_util.restoreAppState()
+        try:
+            self.menu = [(u"Zoom in (*)", zoom_in),
+                         (u"Zoom out (#)", zoom_out),
+                         (u"Recenter (Select button)", recenter)]
+            self.keyBindings = {
+                EKeyStar : zoom_in,
+                EKeyHash : zoom_out,
+                EKeyUpArrow : pan_up,
+                EKeyDownArrow : pan_down,
+                EKeyLeftArrow : pan_left,
+                EKeyRightArrow : pan_right,
+                EKeySelect : recenter}
+                         
+            print "Loading map image"
+            self.image = Image.open("C:\\Data\\Images\\gates_000.jpg")
+            self.orig_image = self.image
+            
+            self.zoom = 1
+            self.panX = 0
+            self.panY = 0
+            self.x = 0
+            self.y = 0
+            
+            self.overlay = Image.open("C:\\Data\\Images\\mapui1.jpg")
+            self.overlay_mask = Image.new(self.overlay.size, mode = 'L')
+            self.overlay_mask.blit(Image.open("C:\\Data\\Images\\mapui1_mask.jpg"))
+            self.northIcon = Image.open("C:\\Data\\Images\\northIcon.jpg")
+            self.northIcon_mask = Image.new(self.northIcon.size, mode = 'L')
+            self.northIcon_mask.blit(Image.open("C:\\Data\\Images\\northIcon_mask.jpg"))
+            self.targetArrow = TargetArrow(30, 30, 0)
+            
+            print "Loading map coords"
+            f = file(u"C:\\Data\\Others\\gates_coords.txt", "r")
+            str = ""
+            for line in f:
+                str += line.strip()
+            f.close()
+            mapCoords = eval(str)		
+            self.coords = mapCoords
+            
+            self.lock = Ao_lock()
+            print "Map coords: ", self.coords
+        except Exception, e:
+            print e
+        
+    def run(self):
+        def quit():
+            self.lock.signal()
+            
+        def redraw(rect):
+            self.draw()
+            
+        saveState()
+        setKeyBindings(self.keyBindings)
+        
+        self.setZoom(1)
+        self.panX = 0
+        self.panY = 0
+        
+        app.screen = 'full'
+        app.menu = self.menu
+        app.redraw = redraw
+        app.redraw(None)
+        app.exit_key_handler = quit
+        self.lock.wait()
+        restoreState()
+    
+    def setZoom(self, zoom):
+        if (zoom < 0.3):
+            zoom = 0.2
+        if (zoom > 2.1):
+            zoom = 2.0
+        
+        if (self.zoom == zoom):
+            return
+            
+        (w, h) = self.orig_image.size
+        self.image = self.orig_image.resize((zoom*w, zoom*h))
+        self.zoom = zoom # only update zoom after image resizing is complete for consistency with other icons on the map
+        app.redraw(None)
+        
+    def draw(self):
+        w, h = app.body.size
+            
+        # draw map
+        dx = (userGpsX - self.coords['gpsXMin']) * (PIXELS_PER_GPSX * self.zoom)
+        dy = (userGpsY - self.coords['gpsYMax']) * (PIXELS_PER_GPSY * self.zoom)
+        self.x = w/2 - dx + (self.panX * self.zoom)
+        self.y = h/2 - dy + (self.panY * self.zoom)
+        app.body.blit(self.image, target = (self.x, self.y))
+        
+        # draw user
+        userX = w/2 + (self.panX * self.zoom)
+        userY = h/2 + (self.panY * self.zoom)
+        (iconW, iconH) = userIcon.size
+        app.body.blit(userIcon, mask = userIcon_mask, target = (userX - iconW/2, userY - iconH/3))
+        
+        # draw target
+        targ_dx = (targetGpsX - userGpsX) * (PIXELS_PER_GPSX * self.zoom)
+        targ_dy = (targetGpsY - userGpsY) * (PIXELS_PER_GPSY * self.zoom)
+        targetX = w/2 + targ_dx + (self.panX * self.zoom)
+        targetY = h/2 + targ_dy + (self.panY * self.zoom)
+        (targW, targH) = targetIcon.size
+        app.body.blit(
+            targetIcon,
+            mask = targetIcon_mask,
+            target = (targetX - targW/2, targetY - targH/2))
+        (targLabelW, targLabelH) = targetLabel.size
+        app.body.blit(
+            targetLabel,
+            mask = targetLabel_mask,
+            target = (targetX - targLabelW/2, targetY + targH/2))
 
-# UI elements
-canvas = Canvas()
-title = u"Map UI"
-options = [
-    (u"Zoom in (*)", doNothing),
-    (u"Zoom out (#)", doNothing),
-    (u"Satellite info", doNothing)]
-app_lock = Ao_lock()
-
-# Map elements
-map = Map()
-#userLoc = userLocMod.UserLoc(1005, 1075, 90)
-#targetLoc = targetLocMod.TargetLoc(130, 200)
-
+        # draw signal strength               
+        #app.body.blit(onebarsIcon, mask = onebarsIcon_mask, target = (184, 2))
+        #app.body.blit(twobarsIcon, mask = twobarsIcon_mask, target = (184, 2))
+        #app.body.blit(threebarsIcon, mask = threebarsIcon_mask, target = (184, 2))
+        #app.body.blit(fourbarsIcon, mask = fourbarsIcon_mask, target = (184, 2))
+        app.body.blit(fivebarsIcon, mask = fivebarsIcon_mask, target = (184, 2))
+        
+        # draw arrow indicating north
+        app.body.blit(self.northIcon, mask = self.northIcon_mask, target = (w - self.northIcon.size[0] - 2, h - self.northIcon.size[1] - 30))
+        
+        # draw map ui controls
+        app.body.blit(self.overlay, mask = self.overlay_mask)   
+        
+        # if target is offscreen, draw arrow indicating direction of target
+        if (not(targetX >= 0 and targetX < w and targetY >= 0 and targetY < h)):
+            self.targetArrow.theta = atan2(-(targetGpsY - userGpsY), targetGpsX - userGpsX)
+            self.targetArrow.draw(app.body)
+            (targetLabelW, targetLabelH) = targetLabel.size
+            app.body.blit(targetLabel, mask = targetLabel_mask, target = (30 - targetLabelW/2, 30 + self.targetArrow.radius))
+    
 if __name__ == "__main__":
-    main()
+    map = MapUI()
