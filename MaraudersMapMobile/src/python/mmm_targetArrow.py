@@ -1,5 +1,5 @@
 from math import sin, cos, pi
-import appuifw, colorMod, operator
+import appuifw, mmm_color
 from graphics import *
 
 def circleCoords(x, y, radius):
@@ -33,7 +33,7 @@ class TargetArrow:
         for i in range(0, 7):
             finalVertices[i] = (((cx + finalVertices[i][0]), (cy + finalVertices[i][1])))
         
-        canvas.polygon(finalVertices, outline = colorMod.BLACK, fill = colorMod.GOLD, width = 2)
-        canvas.ellipse(circleCoords(self.x, self.y, self.radius-1), outline = colorMod.GOLD, width = 2)
-        canvas.ellipse(circleCoords(self.x, self.y, self.radius), outline = colorMod.BLACK, width = 2)
+        canvas.polygon(finalVertices, outline = mmm_color.BLACK, fill = mmm_color.GOLD, width = 2)
+        canvas.ellipse(circleCoords(self.x, self.y, self.radius-1), outline = mmm_color.GOLD, width = 2)
+        canvas.ellipse(circleCoords(self.x, self.y, self.radius), outline = mmm_color.BLACK, width = 2)
         

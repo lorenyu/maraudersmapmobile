@@ -21,6 +21,7 @@ class ConfirmingShareUI:
             app.body.blit(self.image)
         
         def loadMap():
+            note(u"Andy has confirmed!")
             app.loadMapUI.run()
             self.lock.signal()
         
