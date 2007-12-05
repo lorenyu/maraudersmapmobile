@@ -6,18 +6,19 @@ from graphics import *
 from mmm_utils import *
 
 def receiveLocation():
-    ao_sleep(3)
+    ao_sleep(20)
     app.receivedLocationUI.run()
     app.redraw(None)
     
 def shareLocation():
-    app.loadMapUI.run()
+    app.confirmingShareUI.run()
+    #app.loadMapUI.run()
     app.redraw(None)
     
 class TalkingUI:
     def __init__(self):
     
-        self.talking_title = "Talking"
+        self.talking_title = u"Talking"
         self.talking_image = Image.open("C:\\Data\\Images\\talking1.jpg")
         self.talking_menu = [
             (u"Mute", receiveLocation),
@@ -36,6 +37,7 @@ class TalkingUI:
             
         saveState()
         app.screen = 'normal'
+        app.title = self.talking_title
         app.menu = self.talking_menu
         app.redraw = talking_redraw
         app.redraw(None)
