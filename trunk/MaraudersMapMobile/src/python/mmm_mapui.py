@@ -5,18 +5,52 @@ from graphics import *
 from e32 import *
 from key_codes import *
 from mmm_utils import *
-from mmm_gps import *
 from mmm_targetArrow import *
 from mmm_icons import *
 from math import sin, cos, pi, atan2
+import positioning
+
+PIXELS_PER_GPSX = 186220
+PIXELS_PER_GPSY = -234192
+
+GPSX_PER_PIXEL = 0.00000537
+GPSY_PER_PIXEL= -0.00000427
+
+# hardcode target's coords
+# Gates parking lot
+#targetGpsX = -122.173424
+#targetGpsY = 37.430778
+# Herrin field
+targetGpsX = -122.172177
+targetGpsY = 37.429811
+
+# if GPS not working, hardcode user's coords
+# Gates GPS coords
+#userGpsX = -122.173156
+#userGpsY = 37.429900
+# AT&T Terrace
+userGpsX = -122.173505
+userGpsY = 37.430328
+# Tressider 
+#userGpsX = -122.170715
+#userGpsY = 37.424196
+
+def updatePosition(event):
+    global userGpsX
+    global userGpsY
+    positionInfo = event['position']
+    courseInfo = event['course']
+    userGpsY = positionInfo['latitude']
+    userGpsX = positionInfo['longitude']
+    app.redraw(None)
 
 class MapUI:
     def __init__(self):
         def zoom_in():
-            self.setZoom(self.zoom + 0.2)
+            self.setZoom(self.zoom + 0.25)
 
         def zoom_out():
-            self.setZoom(self.zoom - 0.2)
+            self.setZoom(self.zoom - 0.25)
         
         def recenter():
             self.panX = 0
@@ -53,7 +87,7 @@ class MapUI:
                 EKeySelect : recenter}
                          
             print "Loading map image"
-            self.image = Image.open("C:\\Data\\Images\\gates_000.jpg")
+            self.image = Image.open("C:\\Data\\Images\\gates_zoom_1.00.jpg")
             self.orig_image = self.image
             
             self.zoom = 1
@@ -86,6 +120,7 @@ class MapUI:
         
     def run(self):
         def quit():
+            positioning.stop_position()
             self.lock.signal()
             
         def redraw(rect):
@@ -97,6 +132,12 @@ class MapUI:
         self.setZoom(1)
         self.panX = 0
         self.panY = 0
+        if (not(in_emulator())):
+            positioning.set_requestors([{
+                "type" : "service",
+                "format" : "application",
+                "data"   : "test_app"}])
+            positioning.position(course = 1, callback = updatePosition, interval = 500000)
         
         app.screen = 'full'
         app.menu = self.menu
@@ -107,16 +148,18 @@ class MapUI:
         restoreState()
     
     def setZoom(self, zoom):
-        if (zoom < 0.3):
-            zoom = 0.2
-        if (zoom > 2.1):
-            zoom = 2.0
+        if (zoom < 0.75):
+            zoom = 0.75
+        if (zoom > 1.5):
+            zoom = 1.5
         
         if (self.zoom == zoom):
             return
             
         (w, h) = self.orig_image.size
-        self.image = self.orig_image.resize((zoom*w, zoom*h))
+        #self.image = self.orig_image.resize((zoom*w, zoom*h))
+        
+        self.image = Image.open("C:\\Data\\Images\\gates_zoom_%.2f.jpg" % zoom)
         self.zoom = zoom # only update zoom after image resizing is complete for consistency with other icons on the map
         app.redraw(None)
         
