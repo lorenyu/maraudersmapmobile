@@ -1,4 +1,0 @@
-Date frozen
-Tues, Nov. 27, 2007
-
-After user testing, added some small features to functional prototype.
