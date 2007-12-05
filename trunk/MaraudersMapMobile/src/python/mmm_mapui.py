@@ -7,8 +7,9 @@ from key_codes import *
 from mmm_utils import *
 from mmm_targetArrow import *
 from mmm_icons import *
-from math import sin, cos, pi, atan2
+from math import sin, cos, pi, atan2, pow, sqrt
 import positioning
+import mmm_color
 
 PIXELS_PER_GPSX = 186220
 PIXELS_PER_GPSY = -234192
@@ -103,6 +104,13 @@ class MapUI:
             self.northIcon_mask = Image.new(self.northIcon.size, mode = 'L')
             self.northIcon_mask.blit(Image.open("C:\\Data\\Images\\northIcon_mask.jpg"))
             self.targetArrow = TargetArrow(30, 30, 0)
+            self.targetArrow.isCircleVisible = False
+            self.targetArrow.setScale(0.5)
+            self.targetArrow.color = mmm_color.GOLD
+            self.userArrow = TargetArrow(30, 30, 0)
+            self.userArrow.isCircleVisible = False
+            self.userArrow.setScale(0.5)
+            self.userArrow.color = mmm_color.BLUE
             
             print "Loading map coords"
             f = file(u"C:\\Data\\Others\\gates_coords.txt", "r")
@@ -149,6 +157,7 @@ class MapUI:
     
     def setZoom(self, zoom):
         if (zoom < 0.75):
+            
             zoom = 0.75
         if (zoom > 1.5):
             zoom = 1.5
@@ -162,6 +171,39 @@ class MapUI:
         self.image = Image.open("C:\\Data\\Images\\gates_zoom_%.2f.jpg" % zoom)
         self.zoom = zoom # only update zoom after image resizing is complete for consistency with other icons on the map
         app.redraw(None)
+    
+    def computeArrowLocation(self, (x1, y1), (x2, y2), arrowRadius):
+        (x1, y1) = (float(x1), float(y1))
+        (x2, y2) = (float(x2), float(y2))
+        
+        # compute Ax + By = 1
+        det = x1 * y2 - x2 * y1
+        if (det == 0):
+            A = -y2 + y1
+            B = x2 - x1
+        else:
+            A = (y2 - y1) / det
+            B = (-x2 + x1) / det
+        
+        (w, h) = app.body.size
+        # find intersections with sides
+        if (x2 < x1):
+            y = (1 - A*arrowRadius) / B
+            if (y >= arrowRadius and y < h - arrowRadius):
+                return (arrowRadius, y)
+        if (x2 > x1):
+            y = (1 - A*(w - arrowRadius)) / B
+            if (y >= arrowRadius and y < h - arrowRadius):
+                return (w - arrowRadius, y)
+        if (y2 < y1):
+            x = (1 - B*arrowRadius) / A
+            if (x >= arrowRadius and x < w - arrowRadius):
+                return (x, arrowRadius)
+        if (y2 > y1):
+            x = (1 - B*(h - arrowRadius)) / A
+            if (x >= arrowRadius and x < w - arrowRadius):
+                return (x, h - arrowRadius)
+        return (0, 0)
         
     def draw(self):
         w, h = app.body.size
@@ -173,17 +215,32 @@ class MapUI:
         self.y = h/2 - dy + (self.panY * self.zoom)
         app.body.blit(self.image, target = (self.x, self.y))
         
-        # draw user
+        # user and target coordinates, and target direction
         userX = w/2 + (self.panX * self.zoom)
         userY = h/2 + (self.panY * self.zoom)
-        (iconW, iconH) = userIcon.size
-        app.body.blit(userIcon, mask = userIcon_mask, target = (userX - iconW/2, userY - iconH/3))
-        
-        # draw target
         targ_dx = (targetGpsX - userGpsX) * (PIXELS_PER_GPSX * self.zoom)
         targ_dy = (targetGpsY - userGpsY) * (PIXELS_PER_GPSY * self.zoom)
         targetX = w/2 + targ_dx + (self.panX * self.zoom)
         targetY = h/2 + targ_dy + (self.panY * self.zoom)
+        targetDirection = atan2(-(targetGpsY - userGpsY), targetGpsX - userGpsX)
+        
+        # draw line between user and target
+        (x, y) = (userX, userY)
+        remaining = sqrt(pow(targetX - userX, 2) + pow(targetY - userY, 2))
+        dashLength = 10
+        while (remaining > dashLength):
+            theta = atan2(targetY - y, targetX - x)
+            app.body.line([(x,y), (x + dashLength*cos(theta), y + dashLength*sin(theta))], outline = mmm_color.GOLD, width = 2)
+            remaining = remaining - 2 * dashLength
+            x = x + 2.0 * dashLength*cos(theta)
+            y = y + 2.0 * dashLength*sin(theta)
+        #app.body.line([(userX, userY), (targetX, targetY)], outline = mmm_color.GOLD, width = 2)
+        
+        # draw user
+        (iconW, iconH) = userIcon.size
+        app.body.blit(userIcon, mask = userIcon_mask, target = (userX - iconW/2, userY - iconH/3))
+        
+        # draw target        
         (targW, targH) = targetIcon.size
         app.body.blit(
             targetIcon,
@@ -194,7 +251,27 @@ class MapUI:
             targetLabel,
             mask = targetLabel_mask,
             target = (targetX - targLabelW/2, targetY + targH/2))
-
+        
+        # if target is offscreen, draw arrow indicating direction of target
+        #if (not(targetX >= 0 and targetX < w and targetY >= 0 and targetY < h)):
+            #self.targetArrow.theta = targetDirection
+            #self.targetArrow.draw(app.body)
+            #(targetLabelW, targetLabelH) = targetLabel.size
+            #app.body.blit(targetLabel, mask = targetLabel_mask, target = (30 - targetLabelW/2, 30 + self.targetArrow.radius))
+            
+        # if both user and target are offscreen, draw arrows indicating position on map     
+        if (not(userX >= -iconW/2 and userX < w + iconW/2 and userY >= -2*iconH/3 and userY < h + iconH/3)
+            and not(targetX >= -targW/2 and targetX < w + targW/2 and targetY >= -targH/2 and targetY < h + targH/2)):
+            arrowRadius = targW/2
+            userArrowLoc = self.computeArrowLocation((w/2, h/2), (userX, userY), arrowRadius)
+            targetArrowLoc = self.computeArrowLocation((w/2, h/2), (targetX, targetY), arrowRadius)
+            (self.userArrow.x, self.userArrow.y) = userArrowLoc
+            (self.targetArrow.x, self.targetArrow.y) = targetArrowLoc
+            self.userArrow.theta = atan2(userY - h/2, userX - w/2)
+            self.targetArrow.theta = atan2(targetY - h/2, targetX - w/2)
+            self.userArrow.draw(app.body)
+            self.targetArrow.draw(app.body)
+            
         # draw signal strength               
         #app.body.blit(onebarsIcon, mask = onebarsIcon_mask, target = (184, 2))
         #app.body.blit(twobarsIcon, mask = twobarsIcon_mask, target = (184, 2))
@@ -204,16 +281,9 @@ class MapUI:
         
         # draw arrow indicating north
         app.body.blit(self.northIcon, mask = self.northIcon_mask, target = (w - self.northIcon.size[0] - 2, h - self.northIcon.size[1] - 30))
-        
+            
         # draw map ui controls
-        app.body.blit(self.overlay, mask = self.overlay_mask)   
-        
-        # if target is offscreen, draw arrow indicating direction of target
-        if (not(targetX >= 0 and targetX < w and targetY >= 0 and targetY < h)):
-            self.targetArrow.theta = atan2(-(targetGpsY - userGpsY), targetGpsX - userGpsX)
-            self.targetArrow.draw(app.body)
-            (targetLabelW, targetLabelH) = targetLabel.size
-            app.body.blit(targetLabel, mask = targetLabel_mask, target = (30 - targetLabelW/2, 30 + self.targetArrow.radius))
+        app.body.blit(self.overlay, mask = self.overlay_mask) 
     
 if __name__ == "__main__":
     map = MapUI()
