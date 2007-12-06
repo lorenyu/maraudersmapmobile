@@ -45,6 +45,29 @@ def updatePosition(event):
     userGpsX = positionInfo['longitude']
     app.redraw(None)
 
+def addOffset((x, y), (dx, dy) ):
+    return (x + dx, y + dy)
+
+def getPanArrowVertices():
+    vertices = [(16, 0), (32, 14), (16, 8), (0, 14)]
+    up = []
+    down = []
+    left = []
+    right = []
+    for i in range(0, 4):
+        up.append( addOffset(vertices[i], (104, 5) ) )
+        down.append( addOffset(rotate(vertices[i], pi), (136, 313) )) 
+        left.append( addOffset(rotate(vertices[i], (-pi/2)), (5, 175)))
+        right.append( addOffset(rotate(vertices[i], (pi/2)), (233, 144)))
+    return up, down, left, right
+
+def getArrow(color):
+    arrow = TargetArrow(30, 30, 0)
+    arrow.isCircleVisible = False
+    arrow.setScale(0.5)
+    arrow.color = color
+    return arrow
+    
 class MapUI:
     def __init__(self):
         def zoom_in():
@@ -103,14 +126,9 @@ class MapUI:
             self.northIcon = Image.open("C:\\Data\\Images\\northIcon.jpg")
             self.northIcon_mask = Image.new(self.northIcon.size, mode = 'L')
             self.northIcon_mask.blit(Image.open("C:\\Data\\Images\\northIcon_mask.jpg"))
-            self.targetArrow = TargetArrow(30, 30, 0)
-            self.targetArrow.isCircleVisible = False
-            self.targetArrow.setScale(0.5)
-            self.targetArrow.color = mmm_color.GOLD
-            self.userArrow = TargetArrow(30, 30, 0)
-            self.userArrow.isCircleVisible = False
-            self.userArrow.setScale(0.5)
-            self.userArrow.color = mmm_color.BLUE
+            self.targetArrow = getArrow(mmm_color.GOLD)
+            self.userArrow = getArrow(mmm_color.BLUE)
+            self.upVertices, self.downVertices, self.leftVertices, self.rightVertices = getPanArrowVertices()
             
             print "Loading map coords"
             f = file(u"C:\\Data\\Others\\gates_coords.txt", "r")
@@ -118,8 +136,7 @@ class MapUI:
             for line in f:
                 str += line.strip()
             f.close()
-            mapCoords = eval(str)		
-            self.coords = mapCoords
+            self.coords = eval(str)		
             
             self.lock = Ao_lock()
             print "Map coords: ", self.coords
@@ -252,12 +269,12 @@ class MapUI:
             mask = targetLabel_mask,
             target = (targetX - targLabelW/2, targetY + targH/2))
         
-        # if target is offscreen, draw arrow indicating direction of target
-        #if (not(targetX >= 0 and targetX < w and targetY >= 0 and targetY < h)):
-            #self.targetArrow.theta = targetDirection
-            #self.targetArrow.draw(app.body)
-            #(targetLabelW, targetLabelH) = targetLabel.size
-            #app.body.blit(targetLabel, mask = targetLabel_mask, target = (30 - targetLabelW/2, 30 + self.targetArrow.radius))
+        # draw pan arrows
+        app.body.polygon(self.upVertices, outline = mmm_color.BLACK, fill = mmm_color.WHITE, width = 2) 
+        app.body.polygon(self.downVertices, outline = mmm_color.BLACK, fill = mmm_color.WHITE, width = 2)
+        app.body.polygon(self.leftVertices, outline = mmm_color.BLACK, fill = mmm_color.WHITE, width = 2) 
+        app.body.polygon(self.rightVertices, outline = mmm_color.BLACK, fill = mmm_color.WHITE, width = 2) 
+        #setCoords(vertices, (106, 9)), 
             
         # if both user and target are offscreen, draw arrows indicating position on map     
         if (not(userX >= -iconW/2 and userX < w + iconW/2 and userY >= -2*iconH/3 and userY < h + iconH/3)
