@@ -1,0 +1,8 @@
+Date frozen
+Tues., Dec 12, 2007
+
+Final version 
+- removed big upper left arrow
+- added two small arrows when neither user or target is on screen
+- static map with no rotation
+- cannot pan or zoom off the edge of the image
