@@ -1,4 +1,14 @@
 Date frozen
 Tues, Nov. 27, 2007
 
+To run on emulator, copy c folder to the symbian folder (e.g. C:\Symbian\9.3\S60_3rd_FP2_Beta\epoc32\winscw\c) and say "yes to all" when prompted to overwrite.
+
+To run on phone, copy c\Data\Images to phone's c:\Data\Images and copy e\python to phone's e:\python.
+
+To run, run the python script ammm_functional.py in .\c\python
+
+Release Notes:
+
 After user testing, added some small features to functional prototype.
+
+This version is still buggy and has some errors, but for the most part still works.
