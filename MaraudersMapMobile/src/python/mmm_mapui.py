@@ -82,19 +82,49 @@ class MapUI:
             app.redraw(None)
             
         def pan_up():
-            self.panY = self.panY + 10
+            self.panY += 10
+            h = app.body.size[1]
+            dy = (userGpsY - self.coords['gpsYMax']) * (PIXELS_PER_GPSY * self.zoom)
+            tempY = h/2 - dy + (self.panY * self.zoom)
+            if (tempY >= 0):
+                self.panY -= 10
+                note(u"You have reached the end of the map.")
+                return
             app.redraw(None)
 
         def pan_down():
-            self.panY = self.panY- 10
+            self.panY -= 10
+            h = app.body.size[1]
+            dy = (userGpsY - self.coords['gpsYMax']) * (PIXELS_PER_GPSY * self.zoom)
+            tempY = h/2 - dy + (self.panY * self.zoom)
+            tempY += self.image.size[1]
+            if (tempY <= h):
+                self.panY += 10
+                note(u"You have reached the end of the map.")
+                return
             app.redraw(None)
                     
         def pan_left():
-            self.panX = self.panX + 10
+            self.panX += 10
+            w = app.body.size[0]
+            dx = (userGpsX - self.coords['gpsXMin']) * (PIXELS_PER_GPSX * self.zoom)
+            tempX = w/2 - dx + (self.panX * self.zoom)
+            if (tempX >= 0):
+                self.panX -= 10
+                note(u"You have reached the end of the map.")
+                return
             app.redraw(None)
                     
         def pan_right():
-            self.panX = self.panX - 10
+            self.panX -= 10
+            w = app.body.size[0]
+            dx = (userGpsX - self.coords['gpsXMin']) * (PIXELS_PER_GPSX * self.zoom)
+            tempX = w/2 - dx + (self.panX * self.zoom)
+            tempX += self.image.size[0]
+            if (tempX <= w):
+                self.panX += 10
+                note(u"You have reached the end of the map.")
+                return
             app.redraw(None)
     
         try:
@@ -108,7 +138,8 @@ class MapUI:
                 EKeyDownArrow : pan_down,
                 EKeyLeftArrow : pan_left,
                 EKeyRightArrow : pan_right,
-                EKeySelect : recenter}
+                EKeySelect : recenter,
+                EKey5 : takeScreenShot}
                          
             print "Loading map image"
             self.image = Image.open("C:\\Data\\Images\\gates_zoom_1.00.jpg")
@@ -123,9 +154,6 @@ class MapUI:
             self.overlay = Image.open("C:\\Data\\Images\\mapui1.jpg")
             self.overlay_mask = Image.new(self.overlay.size, mode = 'L')
             self.overlay_mask.blit(Image.open("C:\\Data\\Images\\mapui1_mask.jpg"))
-            self.northIcon = Image.open("C:\\Data\\Images\\northIcon.jpg")
-            self.northIcon_mask = Image.new(self.northIcon.size, mode = 'L')
-            self.northIcon_mask.blit(Image.open("C:\\Data\\Images\\northIcon_mask.jpg"))
             self.targetArrow = getArrow(mmm_color.GOLD)
             self.userArrow = getArrow(mmm_color.BLUE)
             self.upVertices, self.downVertices, self.leftVertices, self.rightVertices = getPanArrowVertices()
@@ -174,19 +202,34 @@ class MapUI:
     
     def setZoom(self, zoom):
         if (zoom < 0.75):
-            
+            note(u"You cannot zoom further.")
             zoom = 0.75
         if (zoom > 1.5):
+            note(u"You cannot zoom further.")
             zoom = 1.5
         
         if (self.zoom == zoom):
             return
             
-        (w, h) = self.orig_image.size
+        #(w, h) = self.orig_image.size
         #self.image = self.orig_image.resize((zoom*w, zoom*h))
         
         self.image = Image.open("C:\\Data\\Images\\gates_zoom_%.2f.jpg" % zoom)
         self.zoom = zoom # only update zoom after image resizing is complete for consistency with other icons on the map
+        w = app.body.size[0]
+        dx = (userGpsX - self.coords['gpsXMin']) * (PIXELS_PER_GPSX * self.zoom)
+        tempX = w/2 - dx + (self.panX * self.zoom)
+        if (tempX >= 0):
+            self.panX  = (dx - w/2) / self.zoom
+        elif (tempX + self.image.size[0] < w): 
+            self.panX = (w - self.image.size[0] + dx - w/2) / self.zoom
+        h = app.body.size[1]
+        dy = (userGpsY - self.coords['gpsYMax']) * (PIXELS_PER_GPSY * self.zoom)
+        tempY = h/2 - dy + (self.panY * self.zoom)
+        if (tempY > 0):
+            self.panY = (dy - h/2) / self.zoom
+        elif (tempY + self.image.size[1] < h): 
+            self.panY = (h - self.image.size[1] + dy - h/2) / self.zoom
         app.redraw(None)
     
     def computeArrowLocation(self, (x1, y1), (x2, y2), arrowRadius):
@@ -224,7 +267,7 @@ class MapUI:
         
     def draw(self):
         w, h = app.body.size
-            
+        
         # draw map
         dx = (userGpsX - self.coords['gpsXMin']) * (PIXELS_PER_GPSX * self.zoom)
         dy = (userGpsY - self.coords['gpsYMax']) * (PIXELS_PER_GPSY * self.zoom)
@@ -277,7 +320,7 @@ class MapUI:
         #setCoords(vertices, (106, 9)), 
             
         # if both user and target are offscreen, draw arrows indicating position on map     
-        if (not(userX >= -iconW/2 and userX < w + iconW/2 and userY >= -2*iconH/3 and userY < h + iconH/3)
+        if (not(userX >= -iconW/2 and userX < w + iconW/2 and userY >= -iconH/3 and userY < h + iconH/3)
             and not(targetX >= -targW/2 and targetX < w + targW/2 and targetY >= -targH/2 and targetY < h + targH/2)):
             arrowRadius = targW/2
             userArrowLoc = self.computeArrowLocation((w/2, h/2), (userX, userY), arrowRadius)
@@ -296,9 +339,6 @@ class MapUI:
         #app.body.blit(fourbarsIcon, mask = fourbarsIcon_mask, target = (184, 2))
         app.body.blit(fivebarsIcon, mask = fivebarsIcon_mask, target = (184, 2))
         
-        # draw arrow indicating north
-        app.body.blit(self.northIcon, mask = self.northIcon_mask, target = (w - self.northIcon.size[0] - 2, h - self.northIcon.size[1] - 30))
-            
         # draw map ui controls
         app.body.blit(self.overlay, mask = self.overlay_mask) 
     
