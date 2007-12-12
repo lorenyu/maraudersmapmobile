@@ -1,8 +1,16 @@
 # mmm_utils.py
 
 from appuifw import *
+import graphics
 
 oldState = []
+
+numScreenshots = 0
+
+def takeScreenShot():
+    global numScreenshots
+    graphics.screenshot().save("C:\\Data\\Images\\screenshot%.3d.jpg" % numScreenshots)
+    numScreenshots = numScreenshots + 1
 
 def saveState():
     oldState.append((
