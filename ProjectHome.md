@@ -1,0 +1,1 @@
+Mobile application prototype for Nokia Series 60 phones for locating and navigating to people and places.  Uses Flash and Python.
